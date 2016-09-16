@@ -1,82 +1,46 @@
 //call compileFinal preprocessFileLineNumbers "FAR_revive\FAR_revive_init.sqf";
 enablesaving [false, false];
 enableSentences false;
-#include "briefing.hpp"
 
 if (paramsArray select 1 == 1) then setTimeMultiplier 1;
 if (paramsArray select 1 == 2) then setTimeMultiplier 2;
 if (paramsArray select 1 == 3) then setTimeMultiplier 4;
 if (paramsArray select 1 == 4) then setTimeMultiplier 6;
 
-{
-    if(side _x == east) then
-    {
-		_x execVM "loadoutEAST.sqf";
-    };
-} foreach (allUnits);
+//_bleh3 = [] execVM "scripts\getincars.sqf";
 
-{
-    if(side _x == west) then
-    {
-		_x execVM "loadoutWEST.sqf";
-    };
-} foreach (allUnits);
+switch (side player) do {
 
-{
-    if(side _x == resistance) then
-    {
-		_x execVM "loadoutIND.sqf";
-    };
-} foreach (allUnits);
+  case EAST: {
 
-_bleh2 = [] execVM "loadoutEMPTY.sqf";
-//_bleh3 = [] execVM "getincars.sqf";
+    ta01 = player createSimpleTask ["Kill all of the reporters!"];
+    ta01 setSimpleTaskDescription ["There are 10 total on the island in marked cities.","Kill all of the reporters!","Kill all of the reporters!"];
+    ta02 = player createSimpleTask ["Kill all of the cops!"];
+    ta02 setSimpleTaskDescription ["Easier said than done, but you will win if this is completed first.","Kill all of the cops!","Kill all of the cops!"];
+    player setCurrentTask ta01;
 
-if (local player) then { 
-   player enableFatigue false; 
-   player addEventhandler ["Respawn", {player enableFatigue false}]; 
-}; 
-SHK_DeadCivilianCount = 0;
-SHK_DeadCivilianLimit = 2;
-SHK_EndMission = false;
-[] spawn {
-  waituntil {SHK_EndMission};
-  cuttext ["Game over. Unfortunately, you killed too many civilians.","PLAIN",2];
-  sleep 5;
-  endmission "END4";
-  forceEnd;
-};
-
-SHK_fnc_deadCivilians = {
-  hintsilent format ["Civilians dead: %1",_this];
-  if (_this >= SHK_DeadCivilianLimit) then {
-    SHK_EndMission = true;
-    publicvariable "SHK_EndMission";
   };
+
+  case WEST: {
+
+    ta03 = player createSimpleTask ["Kill all of the assassins!"];
+    ta03 setSimpleTaskDescription ["There are up to 4 roaming the island looking for reporters.","Kill all of the assassins!","Kill all of the assassins!"];
+    ta04 = player createSimpleTask ["Do not kill civilians!"];
+    ta04 setSimpleTaskDescription ["The governor will have our head if more than one is killed!","Do not kill civilians!","Do not kill civilians!"];
+    player setCurrentTask ta03;
+
+  };
+
 };
 
-SHK_eh_killed = {
-  private "_side";
-  _side = side (_this select 1);
-  if (_side == WEST) then {
-    SHK_DeadCivilianCount = SHK_DeadCivilianCount + 1;
-    publicvariable "SHK_DeadCivilianCount";
-    if isdedicated then {
-      if (_this >= SHK_DeadCivilianLimit) then {
-        SHK_EndMission = true;
-        publicvariable "SHK_EndMission";
-      };
-    } else {
-      SHK_DeadCivilianCount call SHK_fnc_deadCivilians;
-    };
-  };
-};
-if isserver then {
-  {
-    if (side _x == Civilian && _x iskindof "Man") then {
-      _x addEventHandler ["killed", SHK_eh_killed];
-    };
-  } foreach allunits;
-} else {
-  "SHK_DeadCivilianCount" addpublicvariableeventhandler { (_this select 1) call SHK_fnc_deadCivilians };
-};
+badcar1 setPos (getPos assault vectorAdd [10,10,0.5]);
+badcar3 setPos (getPos saboteur vectorAdd [10,10,0.5]);
+badcar2 setPos (getPos sniper vectorAdd [10,10,0.5]);
+badcar4 setPos (getPos silentops vectorAdd [10,10,0.5]);
+
+assault moveindriver badcar1;
+sniper moveindriver badcar2;
+saboteur moveindriver badcar3;
+silentops moveindriver badcar4;
+
+_nul = [] execVM "scripts\civilians.sqf";
