@@ -1,5 +1,5 @@
 author="Doctor Butts";
-OnLoadName = "Murder Simulator v6 Goon";
+OnLoadName = "TVT24 - Murder Simulator v6 Goon";
 OnLoadMission = "Killers are out to murder all reporters. Cops must stop them!";
 respawn = 4;
 onLoadMissionTime = 1;
