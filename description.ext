@@ -1,0 +1,73 @@
+author="Doctor Butts";
+OnLoadName = "Murder Simulator v6 Goon";
+OnLoadMission = "Killers are out to murder all reporters. Cops must stop them!";
+respawn = 4;
+onLoadMissionTime = 1;
+loadScreen = "mursim.paa";
+overviewPicture = "mursim.paa";
+overviewText = "Cops have to stop killers. Killers kill reporters.";
+enableDebugConsole = 2;
+class Header
+{
+	gameType = TDM;
+	minPlayers = 1;
+	maxPlayers = 24;
+};
+class Params
+{
+	class TimeOfDay
+	{
+	title = "Time of Day";
+	texts[] = {"Moonrise","Full Moon","Dawn","Sunrise","Morning","Noon","Afternoon","Sunset","Dusk"};
+	values[] = {0.5,3,5,6,9,12,15,18,19};
+	default = 9;
+	function = "BIS_fnc_paramDaytime";
+	isGlobal = 1;
+	};
+	class FastDays
+	{
+		title = "Accelerated Day/Night Cycle";
+		values[] = {1,2,3,4};
+		texts[] = {"Disabled","12 hour cycle", "8 hour cycle", "6 hour cycle", "3 hour cycle"};
+		default = 3;
+	};
+};
+class CfgDebriefing
+{  
+	class End1
+	{
+		title = "Killers Win!";
+		subtitle = "Cops Failed";
+		description = "Opfor successfully eliminated all of the reporters!";
+		pictureBackground = "opforwins.jpg";
+		//picture = "flag_CSAT";
+		//pictureColor[] = {0.0,0.3,0.6,1};
+	};
+	class End2
+	{	
+		title = "Cops Win!";
+		subtitle = "Killers Failed";
+		description = "Cops eliminated all of the killers before they could murder all of the reporters.";
+		pictureBackground = "copswin.jpg";
+		//picture = "flag_USA";
+		//pictureColor[] = {0,0,0,1};
+	};
+	class End3
+	{
+		title = "Killers Win!";
+		subtitle = "Cops are dead";
+		description = "Opfor killed all of the cops, now nothing can stop them!";
+		pictureBackground = "copsdead.jpg";
+		//picture = "flag_CSAT";
+		//pictureColor[] = {0.0,0.3,0.6,1};
+	};
+	class End4
+	{
+		title = "Killers Win!";
+		subtitle = "Cops killed too many civilians!";
+		description = "TURN IN YOUR BADGE AND YOUR GUN!";
+		pictureBackground = "copsrbad.jpg";
+		//picture = "flag_CSAT";
+		//pictureColor[] = {0.0,0.3,0.6,1};
+	};
+};
