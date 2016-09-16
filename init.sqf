@@ -15,4 +15,4 @@ execVM "briefing.sqf";
     {
 		_x setPos startPos;
     };
-} foreach (allUnits);
+} foreach allUnits;
