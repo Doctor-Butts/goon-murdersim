@@ -1,5 +1,5 @@
 // =========================================================================================================
-//  Urban Patrol Script  
+//  Urban Patrol Script
 //  Version: 2.2.0
 //  Author: Kronzky (www.kronzky.info / kronzky@gmail.com)
 // ---------------------------------------------------------------------------------------------------------
@@ -8,10 +8,10 @@
 //    markername    = Name of marker that covers the active area. (2nd argument)
 //    (e.g. nul=[this,"town"] execVM "ups.sqf")
 //
-//  Optional parameters: 
+//  Optional parameters:
 //    random        = Place unit at random start position.
 //    randomdn      = Only use random positions on ground level.
-//    randomup      = Only use random positions at top building positions. 
+//    randomup      = Only use random positions at top building positions.
 //    min:n/max:n   = Create a random number (between min and max) of 'clones'.
 //    init:string   = Cloned units' init string. (NOT in Arma3!)
 //    prefix:string = Cloned units' names will start with this prefix.
@@ -29,12 +29,12 @@
 // =========================================================================================================
 
 if (!isServer) exitWith {};
-	
+
 // how far opfors should move away if they're under attack
 // set this to 200-300, when using the script in open areas (rural surroundings)
 #define SAFEDIST 75
 
-// how close unit has to be to target to generate a new one 
+// how close unit has to be to target to generate a new one
 #define CLOSEENOUGH 10
 
 // how close units have to be to each other to share information
@@ -60,7 +60,7 @@ if (isNil("KRON_UPS_INIT")) then {
 	KRON_randomPos = {private["_cx","_cy","_rx","_ry","_cd","_sd","_ad","_tx","_ty","_xout","_yout"];_cx=_this select 0; _cy=_this select 1; _rx=_this select 2; _ry=_this select 3; _cd=_this select 4; _sd=_this select 5; _ad=_this select 6; _tx=random (_rx*2)-_rx; _ty=random (_ry*2)-_ry; _xout=if (_ad!=0) then {_cx+ (_cd*_tx - _sd*_ty)} else {_cx+_tx}; _yout=if (_ad!=0) then {_cy+ (_sd*_tx + _cd*_ty)} else {_cy+_ty}; [_xout,_yout]};
 	// find any building (and its possible building positions) near a position
 	KRON_PosInfo = {private["_pos","_lst","_bld","_bldpos"];_pos=_this select 0; _lst= nearestObjects [_pos,["House","vbs2_house"],20]; if (count _lst==0) then {_bld=0;_bldpos=0} else {_bld=_lst select 0; _bldpos=[_bld] call KRON_BldPos}; [_bld,_bldpos]};
-	/// find the highest building position	
+	/// find the highest building position
 	KRON_BldPos = {private ["_bld","_bi","_bldpos","_maxZ","_bp","_bz","_higher"];_bld=_this select 0;_maxZ=0;_bi=0;_bldpos=0;while {_bi>=0} do {_bp = _bld BuildingPos _bi;if ((_bp select 0)==0) then {_bi=-99} else {_bz=_bp select 2; _higher = ((_bz>_maxZ) || ((abs(_bz-_maxZ)<.5) && (random 1>.5))); if ((_bz>4) && _higher) then {_maxZ=_bz; _bldpos=_bi}};_bi=_bi+1};_bldpos};
 	KRON_OnRoad = {private["_pos","_car","_tries","_lst"];_pos=_this select 0; _car=_this select 1; _tries=_this select 2; _lst=_pos nearRoads 4; if ((count _lst!=0) && (_car || !(surfaceIsWater _pos))) then {_tries=99}; (_tries+1)};
 	KRON_getDirPos = {private["_a","_b","_from","_to","_return"]; _from = _this select 0; _to = _this select 1; _return = 0; _a = ((_to select 0) - (_from select 0)); _b = ((_to select 1) - (_from select 1)); if (_a != 0 || _b != 0) then {_return = _a atan2 _b}; if ( _return < 0 ) then { _return = _return + 360 }; _return};
@@ -86,7 +86,7 @@ if (isNil("KRON_UPS_INIT")) then {
 	KRON_getArg = {private["_cmd","_arg","_list","_a","_v"]; _cmd=_this select 0; _arg=_this select 1; _list=_this select 2; _a=-1; {_a=_a+1; _v=format["%1",_list select _a]; if (_v==_cmd) then {_arg=(_list select _a+1)}} foreach _list; _arg};
 	KRON_deleteDead = {private["_u","_s"];_u=_this select 0; _s= _this select 1; _u removeAllEventHandlers "killed"; sleep _s; deletevehicle _u};
 	KRON_KnownEnemy=[objNull,objNull,objNull]; // enemy information is shared between different groups
-	
+
 	if (isNil("KRON_UPS_Debug")) then {KRON_UPS_Debug=0};
 	//KRON_HQ="Logic" createVehicle [0,0];
 	KRON_UPS_Instances=0;
@@ -106,11 +106,11 @@ sleep (random 1);
 
 KRON_UPS_Instances =	KRON_UPS_Instances + 1;
 
-// get name of area marker 
+// get name of area marker
 _areamarker = _this select 1;
 if (isNil ("_areamarker")) exitWith {
 	hint "UPS: Area marker not defined.\n(Typo, or name not enclosed in quotation marks?)";
-};	
+};
 
 _centerpos = [];
 _centerX = [];
@@ -127,17 +127,17 @@ _getAreaInfo = {
 		_centerpos = getMarkerPos _areamarker;
 		_centerX = abs(_centerpos select 0);
 		_centerY = abs(_centerpos select 1);
-	
+
 		// X/Y range of target area
 		_areasize = getMarkerSize _areamarker;
 		_rangeX = _areasize select 0;
 		_rangeY = _areasize select 1;
 		// marker orientation (needed as negative value!)
 		_areadir = (markerDir _areamarker) * -1;
-	
+
 		_areaname = _areamarker;
-		
-		// show area marker 
+
+		// show area marker
 		_showmarker = if ("SHOWMARKER" in _UCthis) then {"SHOWMARKER"} else {"HIDEMARKER"};
 		if (_showmarker=="HIDEMARKER") then {
 			_areamarker setMarkerAlpha 0;
@@ -146,13 +146,13 @@ _getAreaInfo = {
 		_centerpos = getPos _areamarker;
 		_centerX = abs(_centerpos select 0);
 		_centerY = abs(_centerpos select 1);
-	
+
 		// X/Y range of target area
 		_rangeX = triggerArea _areamarker select 0;
 		_rangeY = triggerArea _areamarker select 1;
 		// marker orientation (needed as negative value!)
 		_areadir = (getDir _areamarker) * -1;
-		
+
 		_areaname = vehicleVarName _areamarker;
 	};
 	// update trigger position
@@ -164,12 +164,12 @@ _getAreaInfo = {
 sleep .01;
 
 // unit that's moving
-_obj = _this select 0;		
+_obj = _this select 0;
 _npc = _obj;
 // is anybody alive in the group?
-_exit = true;		
+_exit = true;
 if (typename _obj=="OBJECT") then {
-	if (alive _npc) then {_exit = false;}		
+	if (alive _npc) then {_exit = false;}
 } else {
 	if (count _obj>0) then {
 		{if (alive _x) then {_npc = _x; _exit = false;}} forEach _obj;
@@ -199,7 +199,7 @@ _issoldier = false;
 }forEach [east,west,independent,civilian];
 
 _friends=[];
-_enemies=[];	
+_enemies=[];
 _sharedenemy=0;
 if (_issoldier) then {
 	_sharedenemy = switch (side _npc) do {
@@ -220,7 +220,7 @@ sleep .01;
 //player sidechat format["%1, friends: %2, enemies: %3 (%4)",_npc,_friends,_enemies,_sharedenemy];
 
 
-// global unit variable to externally influence script 
+// global unit variable to externally influence script
 _named = false;
 _npcname = str(side _npc);
 if ("NAMED" in _UCthis) then {
@@ -237,7 +237,7 @@ _sindir=sin(_areadir);
 
 // minimum distance of new target position
 if (_rangeX==0) exitWith {
-	hint format["UPS: Cannot patrol Sector: %1\nArea Marker doesn't exist",_areaname]; 
+	hint format["UPS: Cannot patrol Sector: %1\nArea Marker doesn't exist",_areaname];
 };
 _mindist=(_rangeX^2+_rangeY^2)/4;
 
@@ -249,7 +249,7 @@ _speedmode = _orgSpeed;
 // set first target to current position (so we'll generate a new one right away)
 _currPos = getpos _npc;
 _orgPos = _currPos;
-_orgWatch=[_currPos,50,getDir _npc] call KRON_relPos; 
+_orgWatch=[_currPos,50,getDir _npc] call KRON_relPos;
 _orgDir = getDir _npc;
 _avoidPos = [0,0];
 _flankPos = [0,0];
@@ -292,30 +292,30 @@ _pause = if ("NOWAIT" in _UCthis) then {"NOWAIT"} else {"WAIT"};
 _nomove  = if ("NOMOVE" in _UCthis) then {"NOMOVE"} else {"MOVE"};
 // don't follow outside of marker area
 _nofollow = if ("NOFOLLOW" in _UCthis) then {"NOFOLLOW"} else {"FOLLOW"};
-// share enemy info 
+// share enemy info
 _shareinfo = if ("NOSHARE" in _UCthis) then {"NOSHARE"} else {"SHARE"};
 // "area cleared" trigger activator
 _usetrigger = if ("TRIGGER" in _UCthis) then {"TRIGGER"} else {if ("NOTRIGGER" in _UCthis) then {"NOTRIGGER"} else {"SILENTTRIGGER"}};
 // suppress fight behaviour
 if ("NOAI" in _UCthis) then {_issoldier=false};
-// adjust cycle delay 
+// adjust cycle delay
 _cycle = ["CYCLE:",5,_UCthis] call KRON_getArg;
 // drop units at random positions
 _initpos = "ORIGINAL";
 if ("RANDOM" in _UCthis) then {_initpos = "RANDOM"};
-if ("RANDOMUP" in _UCthis) then {_initpos = "RANDOMUP"}; 
-if ("RANDOMDN" in _UCthis) then {_initpos = "RANDOMDN"}; 
+if ("RANDOMUP" in _UCthis) then {_initpos = "RANDOMUP"};
+if ("RANDOMDN" in _UCthis) then {_initpos = "RANDOMDN"};
 // don't position groups or vehicles on rooftops
 if ((_initpos!="ORIGINAL") && ((!_isman) || (count _members)>1)) then {_initpos="RANDOMDN"};
 // set behaviour modes (or not)
 _noslow = if ("NOSLOW" in _UCthis) then {"NOSLOW"} else {"SLOW"};
 if (_noslow!="NOSLOW") then {
-	_npc setbehaviour "safe"; 
+	_npc setbehaviour "safe";
 	_npc setSpeedMode "limited";
 	_speedmode = "limited";
-}; 
+};
 
-// make start position random 
+// make start position random
 if (_initpos!="ORIGINAL") then {
 	// find a random position (try a max of 20 positions)
 	_try=0;
@@ -337,13 +337,13 @@ if (_initpos!="ORIGINAL") then {
 	};
 	if (_bldpos==0) then {
 		if (_isman) then {
-			{_x setPos _currPos} foreach units _npc; 
+			{_x setPos _currPos} foreach units _npc;
 		} else {
 			_npc setPos _currPos;
 		};
 	} else {
 	// put the unit on top of a building
-		_npc setPos (_bld buildingPos _bldpos); 
+		_npc setPos (_bld buildingPos _bldpos);
 		_npc setUnitPos "up";
 		_currPos = getPos _npc;
 		_onroof = true;
@@ -376,9 +376,9 @@ if (_track=="TRACK") then {
 	};
 	_trackername setMarkerColor _markercolor;
 	_trackername setMarkerText format["%1",_grpidx];
-	_trackername setmarkerpos _currPos; 
+	_trackername setmarkerpos _currPos;
 	_trackername setMarkerSize [.5,.5];
-	
+
 	_destname=format["dest_%1",_grpidx];
 	_markerobj = createMarker[_destname,[0,0]];
 	_markerobj setMarkerShape "ICON";
@@ -391,7 +391,7 @@ if (_track=="TRACK") then {
 	_destname setMarkerColor _markercolor;
 	_destname setMarkerText format["%1",_grpidx];
 	_destname setMarkerSize [.5,.5];
-};	
+};
 sleep .01;
 
 // delete dead units
@@ -423,11 +423,11 @@ _nameprefix = ["PREFIX:","UPSCLONE",_UCthis] call KRON_getArg;
 		// copy groups
 		if (isNil ("KRON_cloneindex")) then {
 			KRON_cloneindex = 0;
-		}; 
+		};
 		// make the clones civilians
 		// use random Civilian models for single unit groups
 		if ((_unittype=="C_man_1") && (count _members==1)) then {_rnd=1+round(random 6); if (_rnd>1) then {_unittype=format["C_man_polo_%1_F",_rnd]}};
-		
+
 		_grp=createGroup side _npc;
 		_lead = _grp createUnit [_unittype, getpos _npc, [], 0, "form"];
 		KRON_cloneindex = KRON_cloneindex+1;
@@ -457,7 +457,7 @@ _nameprefix = ["PREFIX:","UPSCLONE",_UCthis] call KRON_getArg;
 		} foreach _members;
 		_nul=[_lead,_areamarker,_pause,_noslow,_nomove,_nofollow,_initpos,_track,_showmarker,_shareinfo,"DELETE:",_deletedead] execVM "ups.sqf";
 		sleep .05;
-	};	
+	};
 	//processInitCommands;
 };
 sleep .01;
@@ -519,21 +519,21 @@ while {_loop} do {
 	// keep track of how long we've been moving towards a destination
 	_timeontarget=_timeontarget+_currcycle;
 	_react=_react+_currcycle;
-			
+
 	// did anybody in the group got hit?
-	_newdamage=0; 
+	_newdamage=0;
 	{
 		if (((damage _x)>0.2) || (isNull _x)) then {
-			_newdamage=_newdamage+(damage _x); 
+			_newdamage=_newdamage+(damage _x);
 			// damage has increased since last round
 			if (_newdamage>_lastdamage) then {
-				_lastdamage=_newdamage; 
+				_lastdamage=_newdamage;
 				_gothit=true;
 			};
-			_hitPos=getpos _x; 
+			_hitPos=getpos _x;
 			if (!alive _x) then {
-				_members=_members-[_x]; 
-				_friends=_friends-[_x]; 
+				_members=_members-[_x];
+				_friends=_friends-[_x];
 			};
 		};
 	} foreach _members;
@@ -545,52 +545,52 @@ while {_loop} do {
 	} else {
 		// did the leader die?
 		if (!alive _npc) then {
-			_npc = _members select 0; 
+			_npc = _members select 0;
 			group _npc selectLeader _npc;
 			if (isPlayer _npc) then {_exit=true};
 		};
 	};
-	
+
 	// current position
 	_currPos = getpos _npc; _currX = _currPos select 0; _currY = _currPos select 1;
 	if (_track=="TRACK") then { _trackername setmarkerpos _currPos; };
-	
+
 	// if the AI is a civilian we don't have to bother checking for enemy encounters
 	if ((_issoldier) && ((count _enemies)>0) && !(_exit)) then {
 
-		// if the leader comes across another unit that's either injured or dead, go into combat mode as well. 
+		// if the leader comes across another unit that's either injured or dead, go into combat mode as well.
 		// If the other person is still alive, share enemy information.
 		if (_shareinfo=="SHARE") then {
 			_others=_friends-_members-[player];
 			{
 				if ((!(isNull _x) && (_npc distance _x<SHAREDIST)) && ((damage _x>.5) || (behaviour _x in ["AWARE","COMBAT"]))) exitWith {
-					_npc setBehaviour "aware"; 
-					_gothit=true; 
+					_npc setBehaviour "aware";
+					_gothit=true;
 					if ((_hitPos select 0)==0) then {_hitPos = getPos _x};
 					if (_npc knowsabout _x>3) then {
-						if (alive _x) then {_npc reveal (KRON_KnownEnemy select _sharedenemy)}; 
+						if (alive _x) then {_npc reveal (KRON_KnownEnemy select _sharedenemy)};
 					};
 				};
 			}forEach _others;
 		};
 		sleep .01;
-			
+
 		// did the group spot an enemy?
 		_lastknown=_opfknowval;
-		_opfknowval=0; 
+		_opfknowval=0;
 		_maxknowledge=0;
 		{
-			_knows=_npc knowsabout _x; 
+			_knows=_npc knowsabout _x;
 			if ((alive _x) && (_knows>0.2) && (_knows>_maxknowledge)) then {
-				KRON_KnownEnemy set [_sharedenemy,_x]; 
-				_opfknowval=_opfknowval+_knows; 
+				KRON_KnownEnemy set [_sharedenemy,_x];
+				_opfknowval=_opfknowval+_knows;
 				_maxknowledge=_knows;
 			};
 			if (!alive _x) then {_enemies=_enemies-[_x]};
 			if (_maxknowledge==4) exitWith {};
 		}forEach _enemies;
 		sleep .01;
-		
+
 		_pursue=false;
 		_accuracy=100;
 		// opfor spotted an enemy or got shot, so start pursuit
@@ -600,7 +600,7 @@ while {_loop} do {
 			// make the exactness of the target dependent on the knowledge about the shooter
 			_accuracy=21-(_maxknowledge*5);
 		};
-		
+
 		if (isNull (KRON_KnownEnemy select _sharedenemy)) then {
 			_pursue=false;
 		};
@@ -615,15 +615,15 @@ while {_loop} do {
 			_targetPos = [(_targetPos select 0) + _offsX, (_targetPos select 1) + _offsY];
 			_targetX = _targetPos select 0; _targetY = _targetPos select 1;
 			{_x dowatch _targetPos} foreach units _npc;
-			sleep .01;			
+			sleep .01;
 
 			// also go into "combat mode"
-			_npc setSpeedMode "full"; 
+			_npc setSpeedMode "full";
 			_speedmode = "full";
 			_npc setbehaviour "combat";
 			_pause="NOWAIT";
 			_waiting=0;
-			
+
 			// angle from unit to target
 			_dir1 = [_currPos,_targetPos] call KRON_getDirPos;
 			// angle from target to unit (reverse direction)
@@ -631,7 +631,7 @@ while {_loop} do {
 			// angle from fatality to target
 			_dir3 = if (_hitPos select 0!=0) then {[_hitPos,_targetPos] call KRON_getDirPos} else {_dir1};
 			_dd=(_dir1-_dir3);
-			
+
 			// unit position offset straight towards target
 			_relUX = sin(_dir1)*SAFEDIST; _relUY = cos(_dir1)*SAFEDIST;
 			// target position offset straight towards unit
@@ -659,10 +659,10 @@ while {_loop} do {
 				_attackPos = [_attackPos,_centerpos,_rangeX,_rangeY,_areadir] call KRON_stayInside;
 				_targetPos = [_targetPos,_centerpos,_rangeX,_rangeY,_areadir] call KRON_stayInside;
 			};
-			
+
 			_react=0;
 			_fightmode="fight";
-			_timeontarget=0; 
+			_timeontarget=0;
 			_fm=1;
 			 if (KRON_UPS_Debug!=0) then {
 				"dead" setmarkerpos _hitPos; "avoid" setmarkerpos _avoidPos; "flank" setmarkerpos _flankPos; "target" setmarkerpos _attackPos;
@@ -671,7 +671,7 @@ while {_loop} do {
 			// speed up the cycle duration after an incident
 			if (_currcycle>=_cycle) then {_currcycle=1};
 		};
-	}; 
+	};
 	sleep .01;
 
 	if !(_newpos) then {
@@ -689,8 +689,8 @@ while {_loop} do {
 			_damm = damage _npc;
 			// is our damage changing (increasing)?
 			_dammchg = abs(_damm - _lastdamm);
-			
-			// we're either close enough, seem to be stuck, or are getting damaged, so find a new target 
+
+			// we're either close enough, seem to be stuck, or are getting damaged, so find a new target
 			if ((!_swimming) && ((_dist<=_closeenough) || (_totmove<.2) || (_dammchg>0.01) || (_timeontarget>ALERTTIME))) then {_makenewtarget=true;};
 
 			// in 'attack (approach) mode', so follow the flanking path (don't make it too predictable though)
@@ -728,7 +728,7 @@ while {_loop} do {
 						// generate new target position (on the road)
 						_tries=0;
 						while {_tries<20} do {
-							_targetPos=[_centerX,_centerY,_rangeX,_rangeY,_cosdir,_sindir,_areadir] call KRON_randomPos; 
+							_targetPos=[_centerX,_centerY,_rangeX,_rangeY,_cosdir,_sindir,_areadir] call KRON_randomPos;
 							if (_iscar) then {
 								_roadlist = _targetPos nearRoads 100;
 								if (count _roadlist>0) then {
@@ -739,7 +739,7 @@ while {_loop} do {
 								_tries=99;
 							};
 							//_road=[_targetPos,(_isplane||_isboat),_road] call KRON_OnRoad;
-							sleep .01;			
+							sleep .01;
 						};
 					};
 				};
@@ -749,7 +749,7 @@ while {_loop} do {
 				_fm=0;
 				_npc setSpeedMode _orgSpeed;
 				_newpos=true;
-	
+
 				// if we're waiting at patrol end points then don't create a new target right away. Keep cycling though to check for enemy encounters
 				if ((_pause!="NOWAIT") && (_waiting<0)) then {_waiting = (15 + random 20)};
 			};
@@ -763,16 +763,16 @@ while {_loop} do {
 			_drydist=999;
 			// look around, to find a dry spot
 			for [{_a=0}, {_a<=270}, {_a=_a+90}] do {
-				_dp=[_currPos,30,_a] call KRON_relPos; 
+				_dp=[_currPos,30,_a] call KRON_relPos;
 				if !(surfaceIsWater _dp) then {_targetPos=_dp};
 			};
-			_newpos=true; 
+			_newpos=true;
 			_swimming=true;
 		};
 	} else {
 		_swimming=false;
 	};
-		
+
 	_waiting = _waiting - _currcycle;
 	if ((_waiting<=0) && _newpos) then {
 		// tell unit about new target position
@@ -786,40 +786,40 @@ while {_loop} do {
 					_x setBehaviour _orgMode;
 				}forEach _members;
 			};
-			// use individual doMoves if pursuing enemy, 
+			// use individual doMoves if pursuing enemy,
 			// as otherwise the group breaks up too much
 			{_x doMove _targetPos}forEach _members;
 		} else {
 			(group _npc) move _targetPos;
 			(group _npc) setSpeedMode _speedmode;
 		};
-		if (_track=="TRACK") then { 
+		if (_track=="TRACK") then {
 			switch (_fm) do {
-				case 1: 
+				case 1:
 					{_destname setmarkerSize [.4,.4]};
-				case 2: 
+				case 2:
 					{_destname setmarkerSize [.6,.6]};
 				default
 					{_destname setmarkerSize [.5,.5]};
 			};
 			_destname setMarkerPos _targetPos;
 		};
-		_dist=0; 
-		_moved=0; 
-		_lastmove1=10; 
-		_waiting=-1; 
+		_dist=0;
+		_moved=0;
+		_lastmove1=10;
+		_waiting=-1;
 		_newpos=false;
 		_swimming=false;
-		_timeontarget = 0; 
+		_timeontarget = 0;
 	};
-	
+
 	// move on
 	_lastdist = _dist; _lastmove2 = _lastmove1; _lastmove1 = _moved; _lastdamm = _damm;
 
 	// check external loop switch
 	_cont = (call compile format ["KRON_UPS_%1",_npcname]);
 	if (_cont==0) then {_exit=true};
-	
+
 	_makenewtarget=false;
 	if ((_exit) || (isNil("_npc"))) then {
 		_loop=false;

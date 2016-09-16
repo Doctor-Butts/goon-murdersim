@@ -1,0 +1,6 @@
+
+  Search the <font color='#3333FF'><marker name='missionareamain'>eastern part of the island</marker></font> for the assassins and kill them before they can eliminate all of the reporters.
+<br/>
+<br/>I marked the <font color='#3333FF'><marker name='press1mark'>last known location</marker></font>  of each reporter on your map.
+<br/>Additional vehicles can be found at our <font color='#3333FF'><marker name='copsbase'>base</marker></font>.<br/>
+<br/>Tensions are high enough on Altis as it is. If we are caught killing more than one civilian, we are out of a job.<br/>

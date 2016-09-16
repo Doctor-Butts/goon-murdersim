@@ -1,0 +1,18 @@
+"There are 10 reporters on the eastern side of the island we need to protect. The last known areas on the map are indicated.
+<br/>
+<br/>All reporters are dressed in this example uniform
+<br/><img image='img\pressman.jpg'/>
+<br/>
+<br/>Once we are notified by neighborhood watch that a reporter has died, I will tell you and update the map. Remember, it takes time for them to notify us, and the killers may have left the area by the time I let you know.
+<br/>
+<br/>Last Known Locations
+<br/>A reporter was last seen on the <font color='#3333FF'><marker name='press10mark'>shipping dock</marker></font> of the power plant.
+<br/>A reporter was last seen in the <font color='#3333FF'><marker name='press2mark'>storage facility</marker></font>  in the outskirts of Charkia.
+<br/>A reporter was last seen around the <font color='#3333FF'><marker name='press4mark'>church</marker></font>  in Rodopoli.
+<br/>A reporter was last seen near the <font color='#3333FF'><marker name='press5mark'>soccer field</marker></font>  near Paros.
+<br/>A tow truck reported that a reporters <font color='#3333FF'><marker name='press8mark'>car has broken down</marker></font>  near Almyra.
+<br/>A receptionist at the <font color='#3333FF'><marker name='press6mark'>Ghost Hotel</marker></font>  reported that a journalist was staying there.
+<br/>A reporter was spotted near the <font color='#3333FF'><marker name='press9mark'>radar installation</marker></font>  around Sophia.<br/>
+<br/>A reporter was last seen on the <font color='#3333FF'><marker name='press1mark'>docks</marker></font>  of Pyrgos.
+<br/>A reporter was seen buying refreshments from a <font color='#3333FF'><marker name='press3mark'>BluKing</marker></font>  in Dorida.
+<br/>A reporter was observed relaxing on the balcony of a house in <font color='#3333FF'><marker name='press7mark'>Chalkeia</marker></font>.
