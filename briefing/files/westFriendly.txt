@@ -1,0 +1,5 @@
+We will have up to 20 cops on hand to deploy for this operation.
+    <br/>
+    We are only equipped with SMGs and pistols, but a lot of spare ammo, and more of us than them.<br/>
+    <br/><br/>
+    We also have medics, as well as 4 Hunters, 1 Hummingbird, and HEMTTs on standby at our <font color='#3333FF'><marker name='copsbase'>base</marker></font>.

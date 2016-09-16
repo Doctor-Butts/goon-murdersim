@@ -1,0 +1,5 @@
+Kill all of the Altis Life journalists on the <marker name='missionareamain'>eastern side</marker> of the island.<br/>
+    <br/>
+    Their locations are marked like <font color='#3333FF'><marker name='press1mark'>this</marker></font>.<br/>
+    <br/>
+    If you leave the <font color='#FF0000'><marker name='missionareamain'>mission area</marker></font> outlined in red, I will have you killed for abandoning the mission.

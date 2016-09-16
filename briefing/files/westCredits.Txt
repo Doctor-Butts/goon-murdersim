@@ -1,0 +1,11 @@
+<br/>
+Known scripts used<br/>
+Farooqs revive system<br/>
+I modified Mando No Radar to work with ARMA 3<br/>
+Core Time script for skiptime<br/>
+LEAs loadout gen<br/>
+LATAWIEC for this briefing<br/>
+<br/>
+Thanks to google for being a cool search engine and BIS/ARMAHOLIC forums for answering so many of the questions.
+<br/>
+Thanks to the goons for testing
