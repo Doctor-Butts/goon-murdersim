@@ -8,7 +8,7 @@ if (paramsArray select 1 == 2) then setTimeMultiplier 2;
 if (paramsArray select 1 == 3) then setTimeMultiplier 4;
 if (paramsArray select 1 == 4) then setTimeMultiplier 6;
 
-{
+/* {
     if(side _x == east) then
     {
 		_x execVM "loadoutEAST.sqf";
@@ -29,54 +29,27 @@ if (paramsArray select 1 == 4) then setTimeMultiplier 6;
     };
 } foreach (allUnits);
 
-_bleh2 = [] execVM "loadoutEMPTY.sqf";
-//_bleh3 = [] execVM "getincars.sqf";
+_nul = [] execVM "loadoutEMPTY.sqf";
+//_bleh3 = [] execVM "getincars.sqf"; */
 
 if (local player) then { 
    player enableFatigue false; 
    player addEventhandler ["Respawn", {player enableFatigue false}]; 
 }; 
-SHK_DeadCivilianCount = 0;
-SHK_DeadCivilianLimit = 2;
-SHK_EndMission = false;
-[] spawn {
-  waituntil {SHK_EndMission};
-  cuttext ["Game over. Unfortunately, you killed too many civilians.","PLAIN",2];
-  sleep 5;
-  endmission "END4";
-  forceEnd;
-};
 
-SHK_fnc_deadCivilians = {
-  hintsilent format ["Civilians dead: %1",_this];
-  if (_this >= SHK_DeadCivilianLimit) then {
-    SHK_EndMission = true;
-    publicvariable "SHK_EndMission";
-  };
-};
+/* badcar1 setPos (getPos assault vectorAdd [5,5,0.2]);
+badcar3 setPos (getPos saboteur vectorAdd [5,5,0.2]);
+badcar2 setPos (getPos sniper vectorAdd [5,5,0.2]);
+badcar4 setPos (getPos silentops vectorAdd [5,5,0.2]);
 
-SHK_eh_killed = {
-  private "_side";
-  _side = side (_this select 1);
-  if (_side == WEST) then {
-    SHK_DeadCivilianCount = SHK_DeadCivilianCount + 1;
-    publicvariable "SHK_DeadCivilianCount";
-    if isdedicated then {
-      if (_this >= SHK_DeadCivilianLimit) then {
-        SHK_EndMission = true;
-        publicvariable "SHK_EndMission";
-      };
-    } else {
-      SHK_DeadCivilianCount call SHK_fnc_deadCivilians;
-    };
-  };
-};
-if isserver then {
-  {
-    if (side _x == Civilian && _x iskindof "Man") then {
-      _x addEventHandler ["killed", SHK_eh_killed];
-    };
-  } foreach allunits;
-} else {
-  "SHK_DeadCivilianCount" addpublicvariableeventhandler { (_this select 1) call SHK_fnc_deadCivilians };
-};
+assault moveindriver badcar1;
+sniper moveindriver badcar2;
+saboteur moveindriver badcar3;
+silentops moveindriver badcar4; */
+
+_nul = [] execVM "scripts\civilians.sqf";
+
+
+//client inits wait for serverInit to be true before starting, to make sure all variables the server sets up are set up before clients try to refer to them (which would cause errors)
+serverInit = true;
+publicVariable "serverInit";
